@@ -4,8 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mapa Interactivo con Coordenadas Invertidas</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <title>Mapa </title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
     <style>
         #map { 
             height: 600px; 
@@ -22,6 +24,8 @@
 </head>
 <body>
     <h1>Mapa Interactivo</h1>
+
+    
     <div id="map"></div>
     <div id="coordinates"></div>
 
@@ -62,8 +66,8 @@
         // Ajustar vista del mapa
         map.fitBounds(polygon.getBounds());
 
-        // Mostrar coordenadas
-        function mostrarCoordenadas() {
+          // Mostrar coordenadas
+          function mostrarCoordenadas() {
             const coordenadasDiv = document.getElementById('coordinates');
             coordenadasDiv.innerHTML = '<h3>Coordenadas Invertidas del Polígono:</h3>';
             
@@ -93,6 +97,9 @@
 
         // Mostrar coordenadas al cargar
         mostrarCoordenadas();
+      
     </script>
+
+    
 </body>
 </html>
