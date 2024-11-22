@@ -1,105 +1,144 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mapa </title>
+    <title>Mapa Interactivo</title>
+    <!-- Usar la última versión de Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
         #map { 
             height: 600px; 
             width: 100%; 
+            border: 2px solid #333;
+            margin-bottom: 20px;
         }
         #coordinates { 
-            margin-top: 10px; 
-            padding: 10px; 
             background-color: #f4f4f4; 
+            border: 1px solid #ddd;
+            padding: 15px;
             max-height: 300px; 
-            overflow-y: auto; 
+            overflow-y: auto;
+        }
+        #error-message {
+            color: red;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
     <h1>Mapa Interactivo</h1>
-
-    
+    <div id="error-message"></div>
     <div id="map"></div>
     <div id="coordinates"></div>
 
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <!-- Usar la última versión de Leaflet -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
+        // Función de registro de errores
+        function logError(mensaje) {
+            console.error(mensaje);
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.textContent = `Error: ${mensaje}`;
+        }
 
-        // Función para invertir coordenadas
+        // Función para invertir coordenadas con manejo de errores
         function invertirCoordenadas(coordenadas) {
-            return coordenadas.map(coord => [coord[1], coord[0]]);
+            try {
+                return coordenadas.map(coord => [coord[1], coord[0]]);
+            } catch (error) {
+                logError(`Error al invertir coordenadas: ${error.message}`);
+                return [];
+            }
         }
 
+        // Función principal para inicializar el mapa
+        function inicializarMapa() {
+            try {
+                // Coordenadas originales
+                const coordenadasOriginales = [
+                    [-74.7653372148714,1.31711023554749],
+                    [-74.7658149181018,1.31657241655334],
+                    // ... (resto de tus coordenadas)
+                    [-74.7653372148714,1.31711023554749]  // Coordenada de cierre
+                ];
 
+                // Verificar que hay coordenadas
+                if (!coordenadasOriginales || coordenadasOriginales.length === 0) {
+                    throw new Error("No hay coordenadas disponibles");
+                }
 
+                // Invertir coordenadas
+                const polygonCoordinates = invertirCoordenadas(coordenadasOriginales);
 
-        // Coordenadas originales
-        const coordenadasOriginales = [
-            [-74.7653372148714,1.31711023554749],[-74.7658149181018,1.31657241655334],[-74.7661600584363,1.31618140484835],[-74.7668487320487,1.31562431268646],[-74.7674760200967,1.31511687904922],[-74.7675879196505,1.3150367442324],[-74.7684468358275,1.31442164720738],[-74.7666337908658,1.31259787658033],[-74.7661589045342,1.31196819922692],[-74.7645667045634,1.31136932801918],[-74.7647606687222,1.31050057197524],[-74.7652089968518,1.30948993224508],[-74.7673399999999,1.30948399995693],[-74.7661609999999,1.30750699995693],[-74.766784,1.30736099995698],[-74.7684629999999,1.30730399995696],[-74.7685808074442,1.30744003038015],[-74.7689219999999,1.30783399995695],[-74.7690994788846,1.30805329861327],[-74.7692699999999,1.30826399995692],[-74.7702809999999,1.30898399995691],[-74.7713342622839,1.30829463856245],[-74.771514,1.30817699995695],[-74.7729059999999,1.30828199995689],[-74.773399,1.30825999995695],[-74.773491,1.30706399995692],[-74.773945,1.305703999957],[-74.7739509999999,1.30569599995705],[-74.774194,1.30540499995704],[-74.7742,1.30540099995704],[-74.7748239999999,1.30469199995702],[-74.7753019999999,1.30364699995709],[-74.7759413165327,1.30213302430908],[-74.775992,1.30201299995712],[-74.7765687042644,1.3023514072863],[-74.777729316739,1.30310395723249],[-74.7787653165055,1.3040688890397],[-74.7794175839492,1.30457062139962],[-74.7784206175701,1.30603803929749],[-74.7794975684985,1.30685462944078],[-74.7810202570345,1.30860479785961],[-74.7808581858566,1.30877011729479],[-74.7800329597417,1.30916081798586],[-74.7788819618868,1.30970575397949],[-74.7791507333604,1.3105936830007],[-74.7796496897231,1.31155876387856],[-74.7800335215206,1.31236944216336],[-74.7809160639818,1.31325719692162],[-74.7819519947872,1.3139518620092],[-74.7826816669759,1.31454449218992],[-74.7824892922979,1.3148397135409],[-74.7814539234923,1.31615270901613],[-74.7799197668075,1.31711836580396],[-74.7791142470483,1.31731163883789],[-74.7785216920609,1.31855932904149],[-74.7783744561034,1.31859292830389],[-74.7781032004095,1.31865482828916],[-74.7774872719705,1.31867885529771],[-74.776705526673,1.31874267379195],[-74.7762791442128,1.31885406984404],[-74.7756158773435,1.319021170511],[-74.7749841916887,1.31916441853265],[-74.7744799093466,1.31924016450939],[-74.7744685062517,1.31924187775011],[-74.7744658940509,1.31923432489047],[-74.773709603771,1.31889364040044],[-74.7736100497568,1.31896774305222],[-74.7731873971895,1.31928234323837],[-74.7720749236582,1.32037880334128],[-74.7727380737255,1.32116498322903],[-74.7726105196101,1.32126000386384],[-74.7710450449108,1.32242619823156],[-74.7710218875656,1.32236884511954],[-74.7693821565082,1.32366773058976],[-74.7692766040793,1.32347353140761],[-74.7691747277089,1.32341024012454],[-74.7684992642943,1.32299060629588],[-74.7683762186452,1.32291416334792],[-74.7675867315804,1.32189766696466],[-74.7670498620311,1.32113527885468],[-74.766733960669,1.32034105717538],[-74.7664811438211,1.31935618251],[-74.7661337446607,1.31881614784953],[-74.7656916416397,1.3182761394006],[-74.7654389826629,1.31786316832567],[-74.7653372148714,1.31711023554749]  // Coordenada de cierre
-        ];
+                // Verificar coordenadas invertidas
+                if (polygonCoordinates.length === 0) {
+                    throw new Error("No se pudieron invertir las coordenadas");
+                }
 
-        // Invertir coordenadas
-        const polygonCoordinates = invertirCoordenadas(coordenadasOriginales);
+                // Crear mapa
+                const map = L.map('map').setView([polygonCoordinates[0][0], polygonCoordinates[0][1]], 14);
 
-        // Inicializar mapa
-        const map = L.map('map').setView([polygonCoordinates[0][0], polygonCoordinates[0][1]], 14);
+                // Añadir capa de mapa
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; OpenStreetMap contributors'
+                }).addTo(map);
 
-        // Añadir capa de mapa
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map);
+                // Crear polígono
+                const polygon = L.polygon(polygonCoordinates, {
+                    color: 'red',
+                    fillColor: '#f03',
+                    fillOpacity: 0.2
+                }).addTo(map);
 
-        // Crear polígono
-        const polygon = L.polygon(polygonCoordinates, {
-            color: 'red',
-            fillColor: '#f03',
-            fillOpacity: 0.2
-        }).addTo(map);
+                // Ajustar vista del mapa
+                map.fitBounds(polygon.getBounds());
 
-        // Ajustar vista del mapa
-        map.fitBounds(polygon.getBounds());
+                // Función para mostrar coordenadas
+                function mostrarCoordenadas() {
+                    const coordenadasDiv = document.getElementById('coordinates');
+                    coordenadasDiv.innerHTML = '<h3>Coordenadas del Polígono:</h3>';
+                    
+                    polygonCoordinates.forEach((coord, index) => {
+                        coordenadasDiv.innerHTML += `
+                            <p>
+                                Punto ${index + 1}: 
+                                Latitud: ${coord[0].toFixed(6)}, 
+                                Longitud: ${coord[1].toFixed(6)}
+                            </p>
+                        `;
+                    });
+                }
 
-          // Mostrar coordenadas
-          function mostrarCoordenadas() {
-            const coordenadasDiv = document.getElementById('coordinates');
-            coordenadasDiv.innerHTML = '<h3>Coordenadas Invertidas del Polígono:</h3>';
-            
-            polygonCoordinates.forEach((coord, index) => {
-                coordenadasDiv.innerHTML += `
-                    <p>
-                        Punto ${index + 1}: 
-                        Latitud: ${coord[0].toFixed(6)}, 
-                        Longitud: ${coord[1].toFixed(6)}
-                    </p>
-                `;
-            });
+                // Añadir marcadores
+                polygonCoordinates.forEach((coord, index) => {
+                    L.marker(coord)
+                        .addTo(map)
+                        .bindPopup(`Punto ${index + 1}`)
+                        .openPopup();
+                });
+
+                // Evento de clic en polígono
+                polygon.on('click', () => {
+                    alert('Has hecho clic en el polígono');
+                });
+
+                // Mostrar coordenadas
+                mostrarCoordenadas();
+
+            } catch (error) {
+                logError(`Error al inicializar mapa: ${error.message}`);
+            }
         }
 
-        // Añadir marcadores en cada punto
-        polygonCoordinates.forEach((coord, index) => {
-            L.marker(coord)
-                .addTo(map)
-                .bindPopup(`Punto ${index + 1}`)
-                .openPopup();
-        });
-
-        // Evento de clic en polígono
-        polygon.on('click', () => {
-            alert('Has hecho clic en el polígono');
-        });
-
-        // Mostrar coordenadas al cargar
-        mostrarCoordenadas();
-      
+        // Esperar a que el DOM esté completamente cargado
+        document.addEventListener('DOMContentLoaded', inicializarMapa);
     </script>
-
-    
 </body>
 </html>
